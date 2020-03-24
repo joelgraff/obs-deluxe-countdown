@@ -3,24 +3,28 @@
 ![](images/countdown_banner.png)
 ## INSTALLATION
 
-Save the file, [deluxe_countdown.py](https://github.com/joelgraff/obs-deluxe-countdown/blob/master/deluxe_countdown.py) to the OBS scripts directory.
-The script need not be saved in any specific folder.
+### Download
+
+Save the file, [deluxe_countdown.py](https://github.com/joelgraff/obs-deluxe-countdown/blob/master/deluxe_countdown.py) to the OBS scripts directory. The script need not be saved in any specific folder.
+
+### Create Sources
 
 Once downloaded, open OBS and in an empty scene, create a new source
 by clicking on the "+" icon at the bottom of the sources window:
 
 ![](images/obs_add_source.png)
 
-Add a "Screen Capture" source and click OK twice.
-You can turn the source off by clicking the eye icon.
+Add a "Screen Capture" source and click OK twice (you can turn the source off by clicking the eye icon).
 
-Then, add a Text source and name it "countdown"
+Then, add a Text source and name it "countdown".
 
 When you're done, your scene sources should look as follows:
 
 ![](images/obs_countdown_sources.png)
 
-Now, select "Tools -> Scripts" from the menu at the top of the OBS window
+### Add The Script
+
+Select "Tools -> Scripts" from the menu at the top of the OBS window
 and click the "+" button at the lower left to add a new script.
 
 Navigate to the folder where the deluxe_countdown.py script file is located
