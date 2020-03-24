@@ -31,8 +31,10 @@ Scene sources should look as follows:
 
 ![](images/obs_scripts_configure.png)
 
+
 #### Interval Type
   Select "Duration" or "Date/Time" from the dropdown.
+
 
 #### Duration
   Timer counts down the specified time from the moment the time is entered or the timer is reset.
@@ -42,17 +44,21 @@ Scene sources should look as follows:
  - 23:45       23 minutes, 45 seconds
  - 23:45:15    23 hours, 45 minutes, 15 seconds
 
+
 #### Date/Time
   Timer counts down to the target date / time from the current date / time.  Reseting the timer has noe effect.
 
   The date may be spcified in MM/DD/YYYY format or the literal "TODAY" to ensure the current day's date is used.
   The time box indicates the target time in 12-hour or 24-hour format.  12-hour format must use "am" or "pm".
 
+
 #### End Text
   The text which replaces the timer when the countdown terminates or invalid values are entered.
 
+
 #### Reset Button
   Click to reset the timer (duration timer only).
+
 
 ## Contact
 
