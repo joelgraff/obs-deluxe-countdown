@@ -56,9 +56,6 @@ class Clock():
         _current_time = datetime.datetime.now()
         _result = None
 
-        if self.target_time is None:
-            return "00:00:00"
-
         #calculate string of the time remaining since the timer was reset
         if self.mode == 'duration':
             _delta = _current_time - self.reference_time
@@ -70,6 +67,12 @@ class Clock():
             _result = str(_duration - _delta).split(':')
 
         #calculate string of the time remaining until the target time is reached
+        elif self.target_time is None:
+            return "00:00:00"
+
+        elif self.target_time < _current_time:
+            return "00:00:00"
+
         else:
             _result = str(self.target_time - _current_time).split(':')
 
@@ -84,7 +87,8 @@ class Clock():
         _result = ':'.join(_result)
 
         if len(_days_hours) > 1:
-            _result = _days_hours[0] + ', ' + _result
+            if _days_hours[0][0:2] != '-1':
+                _result = _days_hours[0] + ', ' + _result
 
         return _result
 
@@ -165,13 +169,20 @@ class Clock():
 
         #adjust 12-hour pm to 24-hour format
         if _is_pm:
-            target_time[0] += 12
+            if target_time[0] < 12:
+                target_time[0] += 12
+
+        elif target_time[0] == 12:
+                target_time[0] = 0
+
+        if target_time[0] > 23:
+            target_time[0] = 0
 
         _target = None
         _now = datetime.datetime.now()
 
         #calculate date
-        if target_date[0] == 'TODAY':
+        if target_date == 'TODAY':
             target_date = [_now.month, _now.day, _now.year]
 
         else:
@@ -228,8 +239,6 @@ class State():
 
         _p['text_source'] =\
             _fn('Text Source', '', self.OBS_COMBO, self.get_source_list())
-
-        _p['reset_button'] = _fn('Reset', reset_button_clicked, self.OBS_BUTTON)
 
         return _p
 
@@ -305,13 +314,13 @@ def update_text():
     if not _source:
         return
 
-    if time_string is None:
-        time_string = script_state.get_value('end_text')
+    if _time is None or _time == "00:00:00":
+        _time = script_state.get_value('end_text')
 
     _settings = obs.obs_data_create()
     _source = obs.obs_get_source_by_name(_source)
 
-    obs.obs_data_set_string(_settings, 'text', time_string)
+    obs.obs_data_set_string(_settings, 'text', _time)
     obs.obs_source_update(_source, _settings)
     obs.obs_data_release(_settings)
     obs.obs_source_release(_source)
@@ -330,7 +339,7 @@ def activate(activating):
     #add the timer if becoming active
     if activating:
 
-        update_text(script_state.clock.get_time())
+        update_text()
         obs.timer_add(update_text, 1000)
 
     #remove if going inactive
@@ -379,6 +388,7 @@ def reset():
         activate(_active)
 
     script_state.clock.reset()
+    update_text()
 
 def reset_button_clicked(props, p):
     """
@@ -411,7 +421,7 @@ def script_update(settings):
         _item.cur_value = obs.obs_data_get_string(settings, _key)
 
     script_state.clock.reset()
-    update_text(script_state.clock.get_time())
+    update_text()
 
     activate(True)
 
@@ -475,13 +485,12 @@ def script_properties():
             for _item in _v.items:
                 obs.obs_property_list_add_string(_p, _item, _item)
 
-        elif _v.type == script_state.OBS_BUTTON:
-
-            obs.obs_properties_add_button(props, _k, _v.name, _v.default)
-
         else:
 
             obs.obs_properties_add_text(props, _k, _v.name, _v.type)
+
+    obs.obs_properties_add_button(
+        props, 'reset', 'Reset', reset_button_clicked)
 
     return props
 
