@@ -10,9 +10,7 @@ Save the file, [deluxe_countdown.py](https://github.com/joelgraff/obs-deluxe-cou
 ### Create Sources
 
 Once downloaded, open OBS and in an empty scene, create a new source
-by clicking on the "+" icon at the bottom of the sources window:
-
-![](images/obs_add_source.png)
+by clicking on the "+" icon at the bottom of the sources window: | ![](images/obs_add_source.png)
 
 Add a "Screen Capture" source and click OK twice (you can turn the source off by clicking the eye icon).
 
