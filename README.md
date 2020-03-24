@@ -27,46 +27,32 @@ Scene sources should look as follows:
 
 ## Configuration
 
+#### Configuring the timer is stratightforward.  Note the desctiption at the top describes valid input.
+
 ![](images/obs_scripts_configure.png)
 
-Configuring the timer is stratightforward.  The desctiption at the top
-provides hints on valid input for the text boxes.
+#### Interval Type
+  Select "Duration" or "Date/Time" from the dropdown.
 
-### Interval Type
-Select "Duration" or "Date/Time" from the dropdown.
+#### Duration
+  Timer counts down the specified time from the moment the time is entered or the timer is reset.
+  Values may be an integer or floating point number in minutes or HH:MM:SS format.
+ - 23.5        23 minutes, 30 seconds
+ - 23          23 minutes
+ - 23:45       23 minutes, 45 seconds
+ - 23:45:15    23 hours, 45 minutes, 15 seconds
 
-Duration timers count down the time specified in the Duration textbox
-from the moment the time is entered or the timer is reset.
+#### Date/Time
+  Timer counts down to the target date / time from the current date / time.  Reseting the timer has noe effect.
 
-Date/Time timers count down to the target date / time from the current
-time.  Reseting the timer will have no effect on a Date/Time timer.
+  The date may be spcified in MM/DD/YYYY format or the literal "TODAY" to ensure the current day's date is used.
+  The time box indicates the target time in 12-hour or 24-hour format.  12-hour format must use "am" or "pm".
 
-### Duration
-Timer duration may be specified as an integer or floating point value
-indicating the total number of minutes, or in HH:MM:SS format.
+#### End Text
+  The text which replaces the timer when the countdown terminates or invalid values are entered.
 
-Duration input is parsed as follows:
-
-23.5        23 minutes, 30 seconds
-23          23 minutes
-23:45       23 minutes, 45 seconds
-23:45:15    23 hours, 45 minutes, 15 seconds
-
-### Date
-The date box indicates the date toward which the countdown occurs.
-
-The date may be spcified in MM/DD/YYYY format or the literal "TODAY"
-to ensure the current day's date is used.
-
-### Time
-The time box indicates the target time.  This may be specified in
-12-hour or 24-hour format.  Note that 12-hour format must use "am" or "pm".
-
-### End Text
-The text which replaces the timer when the countdown terminates.
-
-### Resetting
-Click the reset button at any time to reset the timer (duration timer only).
+#### Reset Button
+  Click to reset the timer (duration timer only).
 
 ## Contact
 
