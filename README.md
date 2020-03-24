@@ -13,19 +13,17 @@ Save the file, [deluxe_countdown.py](https://github.com/joelgraff/obs-deluxe-cou
 - Add a "Screen Capture" source and click OK twice (you can turn the source off by clicking the eye icon).
 - Add a Text source and name it "countdown".
 
+
 Scene sources should look as follows:
 
 ![](images/obs_countdown_sources.png)
 
 ### Add The Script
 
-Select "Tools -> Scripts" from the menu at the top of the OBS window
-and click the "+" button at the lower left to add a new script.
-
-Navigate to the folder where the deluxe_countdown.py script file is located
-and select "Open"
-
-Select the new script to begin configuring the countdown timer.
+- Select "Tools -> Scripts" from the top menu
+- Click the "+" button at the lower left of the sciprts dialog to add a new script.
+- Navigate to the folder where the deluxe_countdown.py script file is located and select "Open"
+- Select the new script to begin configuring the countdown timer.
 
 ## Configuration
 
