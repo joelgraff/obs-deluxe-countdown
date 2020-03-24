@@ -14,6 +14,7 @@ Save the file, [deluxe_countdown.py](https://github.com/joelgraff/obs-deluxe-cou
 - Add a Text source and name it "countdown".
 
 Scene sources should look as follows:
+
 ![](images/obs_countdown_sources.png)
 
 ### Add The Script
