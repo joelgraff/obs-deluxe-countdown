@@ -436,9 +436,7 @@ def script_description():
     Date\t\tMM/DD/YYYY or TODAY
     Time\t\tHH:MM:SS [am/pm] for 12-hour
     Start\End Text\tShown during/after countdown
-    Text Source\tSource for start / end text *
-    Clock Source\tSource for clock text *
-    * May use same source
+    Text Source\tSource for start / end text
     """
 
 def script_defaults(settings):
