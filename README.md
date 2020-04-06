@@ -33,7 +33,7 @@ If, after selecting the script, the properties dialog at right simply tells you 
 
 If Python3.6 is not already installed, it can be installed form the Python3 Releases page for the desired platform here:
 
-[https://www.python.org/downloads/release/python-368/]
+https://www.python.org/downloads/release/python-368/
 
 (Note that Python 3.6.8 is the last release of python that comes with pre-com0piled binaries)
 
@@ -41,7 +41,7 @@ After installing Python 3.6, click on the "Pytohn Settings" tab in the OBS Scrip
 
 Once the proper location is selected, you may need to restart OBS for the change to take effect.  The properties panel, however, should now populate for the script.
 
-#### Configuring the timer is stratightforward.  Note the desctiption at the top describes valid input.
+### Configuration
 
 ![](images/obs_scripts_configure.png)
 
