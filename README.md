@@ -27,6 +27,20 @@ Scene sources should look as follows:
 
 ## Configuration
 
+### Script "not available"
+
+If, after selecting the script, the properties dialog at right simply tells you that the script is "not available", it's likely Python3 is not installed / configured properly.  At the time of this writing, the current version of OBS supports Python3.6.
+
+If Python3.6 is not already installed, it can be installed form the Python3 Releases page for the desired platform here:
+
+[https://www.python.org/downloads/release/python-368/]
+
+(Note that Python 3.6.8 is the last release of python that comes with pre-com0piled binaries)
+
+After installing Python 3.6, click on the "Pytohn Settings" tab in the OBS Scripts dialog and browse to the location of the Python 3.6 install.  The location varies by platform.  Under Windows, it's often in the user's director under AppData\Local\Programs\Python36.
+
+Once the proper location is selected, you may need to restart OBS for the change to take effect.  The properties panel, however, should now populate for the script.
+
 #### Configuring the timer is stratightforward.  Note the desctiption at the top describes valid input.
 
 ![](images/obs_scripts_configure.png)
