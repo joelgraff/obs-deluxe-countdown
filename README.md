@@ -65,7 +65,10 @@ Once the proper location is selected, you may need to restart OBS for the change
 
   The date may be spcified in MM/DD/YYYY format or the literal "TODAY" to ensure the current day's date is used.
   The time box indicates the target time in 12-hour or 24-hour format.  12-hour format must use "am" or "pm".
-
+```
+ - 3:15:00 am  3:15 in the morning
+ - 15:35       3:45 in the afternoon
+```
 
 #### End Text
   The text which replaces the timer when the countdown terminates or invalid values are entered.
