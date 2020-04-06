@@ -53,11 +53,12 @@ Once the proper location is selected, you may need to restart OBS for the change
 #### Duration
   Timer counts down the specified time from the moment the time is entered or the timer is reset.
   Values may be an integer or floating point number in minutes or HH:MM:SS format.
+```
  - 23.5        23 minutes, 30 seconds
  - 23          23 minutes
  - 23:45       23 minutes, 45 seconds
  - 23:45:15    23 hours, 45 minutes, 15 seconds
-
+```
 
 #### Date/Time
   Timer counts down to the target date / time from the current date / time.  Reseting the timer has noe effect.
