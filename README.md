@@ -71,6 +71,8 @@ Once the proper location is selected, you may need to restart OBS for the change
 #### End Text
   The text which replaces the timer when the countdown terminates or invalid values are entered.
 
+#### Text Source
+  The text source which will be updated by the script.  If you named a text source "countdown" (as in the tutorial above), it will appear in the dropdown list.
 
 #### Reset Button
   Click to reset the timer (duration timer only).
