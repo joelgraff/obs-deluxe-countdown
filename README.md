@@ -81,8 +81,8 @@ Once the proper location is selected, you may need to restart OBS for the change
 ```
   Given Time:   02:34:06 and Show Units = True / Checked
 
-  HH:MM:SS  02 hours, 34 minutes, 06 seconds
-  H:M:S     2 hours, 34 minutes 6 seconds
+ - HH:MM:SS  02 hours, 34 minutes, 06 seconds
+ - H:M:S     2 hours, 34 minutes 6 seconds
 ```
 
 #### Duration
