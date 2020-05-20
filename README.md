@@ -44,11 +44,11 @@ Once the proper location is selected, you may need to restart OBS for the change
 ![](images/obs_scripts_configure.png)
 
 
-#### Clock Type
+### Clock Type
   Duration - Countdown a specific amount of time from reset / now.
   Time - Countdown from now toward a specifc date / time.
 
-#### Format
+### Format
   Specify the time format as HH:MM:SS.  Time elements may be reduced or eliminated.
 
   Examples:
@@ -61,7 +61,7 @@ Once the proper location is selected, you may need to restart OBS for the change
  - HH:MM      12:34, 12:04
 ```
 
-#### Show Units
+### Show Units
   Display time units (verbose) if checked, use HH:MM:SS format otherwise.
 
   Examples:
@@ -85,7 +85,7 @@ Once the proper location is selected, you may need to restart OBS for the change
  - H:M:S     2 hours, 34 minutes 6 seconds
 ```
 
-#### Duration
+### Duration
   Timer counts down the specified time from the moment the time is entered or the timer is reset.
   Values may be an integer or floating point number in minutes or HH:MM:SS format.
 ```
@@ -95,7 +95,7 @@ Once the proper location is selected, you may need to restart OBS for the change
  - 23:45:15    23 hours, 45 minutes, 15 seconds
 ```
 
-#### Date/Time
+### Date/Time
   Timer counts down to the target date / time from the current date / time.  Reseting the timer has noe effect.
 
   The date may be spcified in MM/DD/YYYY format or the literal "TODAY" to ensure the current day's date is used.
@@ -105,13 +105,13 @@ Once the proper location is selected, you may need to restart OBS for the change
  - 15:35       3:45 in the afternoon
 ```
 
-#### End Text
+### End Text
   The text which replaces the timer when the countdown terminates or invalid values are entered.
 
-#### Text Source
+### Text Source
   The text source which will be updated by the script.  If you named a text source "countdown" (as in the tutorial above), it will appear in the dropdown list.
 
-#### Reset Button
+### Reset Button
   Click to reset the timer (duration timer only).
 
 
