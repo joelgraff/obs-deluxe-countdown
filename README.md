@@ -46,9 +46,46 @@ Once the proper location is selected, you may need to restart OBS for the change
 ![](images/obs_scripts_configure.png)
 
 
-#### Interval Type
-  Select "Duration" or "Date/Time" from the dropdown.
+#### Clock Type
+  Duration - Countdown a specific amount of time from reset / now.
+  Time - Countdown from now toward a specifc date / time.
 
+#### Format
+  Specify the time format as HH:MM:SS.  Time elements may be reduced or eliminated.
+
+  Examples:
+
+```
+ For a given time of 12:34:56 and 12:04:06:
+
+ - HH:MM:SS   12:34:56, 12:04:06
+ - HH:MM:S    12:34:56, 12:04:6
+ - HH:MM      12:34, 12:04
+```
+
+#### Show Units
+  Display time units (verbose) if checked, use HH:MM:SS format otherwise.
+
+  Examples:
+
+```
+ For a given time of 12:34:56:
+
+ - Unchecked  12:34:56
+ - Checked    12 hours, 34 minutes, 56 seconds
+```
+
+  It may be desirable to use single-digit time formats in combination with
+  showing units.
+
+  Examples:
+
+```
+  Given Time:   02:34:06 and Show Units = True / Checked
+
+  HH:MM:SS  02 hours, 34 minutes, 06 seconds
+  H:M:S     2 hours, 34 minutes 6 seconds
+```
 
 #### Duration
   Timer counts down the specified time from the moment the time is entered or the timer is reset.

@@ -48,7 +48,7 @@ class Clock():
 
         self.reference_time = datetime.datetime.now()
 
-    def get_time(self):
+    def get_time(self, show_units):
         """
         Get the countdown time as a string
         """
@@ -64,14 +64,12 @@ class Clock():
             if _delta > _duration:
                 return None
 
+            #build a list of hours, minuts, seconds
             _result = str(_duration - _delta).split(':')
 
         #calculate string of the time remaining until the target time is reached
-        elif self.target_time is None:
-            return "00:00:00"
-
-        elif self.target_time < _current_time:
-            return "00:00:00"
+        elif self.target_time is None or self.target_time < _current_time:
+            _result = ['00', '00', '00']
 
         else:
             _result = str(self.target_time - _current_time).split(':')
@@ -79,18 +77,59 @@ class Clock():
         #formatting to pad missing zeros
         _days_hours = _result[0].split(',')
 
+        #if days were present, strip from the result
         if len(_days_hours) > 1:
             _result = _days_hours[1:] + _result[1:]
 
+
+        #round the seconds to the nearest integer
         _result[-1] = str(int(round(float(_result[-1]), 0)))
-        _result = ['{:02d}'.format(int(_v)) for _v in _result]
-        _result = ':'.join(_result)
+
+        #format according to the format string
+        _format = script_state.properties['format'].cur_value.split(':')
+
+        _fill = []
+
+        for _v in ['h', 'm', 's']:
+
+            _truth = [_v in _w.lower() for _w in _format]
+
+            if not any(_truth):
+                _fill.append('')
+            else:
+                _fill.append(_format[_truth.index(True)])
+
+        _fn = lambda p: '{:0' + str(p) + 'd}' if p < 3 else '{:02d}'
+
+        _fill = [_fn(len(_v)) if _v else None for _v in _fill]
+
+        _result = [_result[_i] if _v else None for _i, _v in enumerate(_fill)]
+
+        _result = [
+            _fill[_i].format(int(_v)) for _i, _v in enumerate(_result) if _v]
+
+        _literal = ':'.join(_result)
+
+        print('LITERAL = ', _literal, show_units, _result)
+
+        if show_units:
+
+            _units = [' hours', ' minutes', ' seconds']
+
+            for _i, _v in enumerate(_result):
+
+                if not _v:
+                    continue
+
+                _result[_i] += _units[_i]
+
+            _literal = ', '.join(_result)
 
         if len(_days_hours) > 1:
             if _days_hours[0][0:2] != '-1':
-                _result = _days_hours[0] + ', ' + _result
+                _literal = _days_hours[0] + ', ' + _literal
 
-        return _result
+        return _literal
 
     def set_duration(self, interval):
         """
@@ -207,12 +246,14 @@ class State():
         self.OBS_COMBO = obs.OBS_COMBO_TYPE_LIST
         self.OBS_TEXT = obs.OBS_TEXT_DEFAULT
         self.OBS_BUTTON = 'OBS_BUTTON'
+        self.OBS_BOOLEAN = 'OBS_BOOLEAN'
 
         #other global vars for OBS callbacks
         self.clock = Clock()
         self.hotkey_id = 0
         self.activated = False
         self.properties = self.build_properties()
+        self.obs_properties = None
 
     def build_properties(self):
         """
@@ -223,15 +264,16 @@ class State():
         _fn = lambda p_name, p_default, p_type, p_items=None:\
             SimpleNamespace(
                 name=p_name, default=p_default, type=p_type, items= p_items,
-                cur_value=p_default)
+                cur_value=p_default, ref=None)
 
         _p = {}
 
-        _p['interval_type'] = _fn(
-            'Interval Type', 'Duration', self.OBS_COMBO,
+        _p['clock_type'] = _fn(
+            'Clock Type', 'Duration', self.OBS_COMBO,
             ['Duration', 'Date/Time']
         )
-
+        _p['format'] = _fn('Format', 'HH:MM:SS', self.OBS_TEXT)
+        _p['show_units'] = _fn('Show Units', False, self.OBS_BOOLEAN)
         _p['duration'] = _fn('Duration', '0', self.OBS_TEXT)
         _p['date'] = _fn('Date', 'TODAY', self.OBS_TEXT)
         _p['time'] = _fn('Time', '12:00:00 pm', self.OBS_TEXT)
@@ -241,6 +283,14 @@ class State():
             _fn('Text Source', '', self.OBS_COMBO, self.get_source_list())
 
         return _p
+
+    def refresh_properties(self, settings):
+        """
+        Refresh the state properites
+        """
+
+        for _k, _v in self.properties.items():
+            _v.cur_value = self.get_value(_k, settings)
 
     def get_source_list(self):
         """
@@ -270,10 +320,16 @@ class State():
         """
 
         if settings:
-            _value = obs.obs_data_get_string(settings, source_name)
+
+            _fn = obs.obs_data_get_string
+
+            if self.properties[source_name].type == self.OBS_BOOLEAN:
+                _fn = obs.obs_data_get_bool
+
+            _value = _fn(settings, source_name)
             self.properties[source_name].cur_value = _value
 
-            return obs.obs_data_get_string(settings, source_name)
+            return _fn(settings, source_name)
 
         return self.properties[source_name].cur_value
 
@@ -304,7 +360,8 @@ def update_text():
     Update the text with the passed time string
     """
 
-    _time = script_state.clock.get_time()
+    _units = script_state.properties['show_units'].cur_value
+    _time = script_state.clock.get_time(_units)
 
     if not _time:
         obs.remove_current_callback()
@@ -405,20 +462,21 @@ def script_update(settings):
 
     activate(False)
 
-    _type = obs.obs_data_get_string(settings, 'interval_type')
+    script_state.refresh_properties(settings)
 
-    if _type == 'Duration':
-        _interval = obs.obs_data_get_string(settings, 'duration')
+    _type = script_state.properties['clock_type'].cur_value
+
+    _is_duration = _type == 'Duration'
+
+    if _is_duration:
+
+        _interval = script_state.properties['duration'].cur_value
         script_state.clock.set_duration(_interval)
 
     else:
-        _date = obs.obs_data_get_string(settings, 'date')
-        _time = obs.obs_data_get_string(settings, 'time')
+        _date = script_state.properties['date']
+        _time = script_state.properties['time']
         script_state.clock.set_date_time(_date, _time)
-
-    #update the current value in the properties
-    for _key, _item in script_state.properties.items():
-        _item.cur_value = obs.obs_data_get_string(settings, _key)
 
     script_state.clock.reset()
     update_text()
@@ -431,11 +489,13 @@ def script_description():
     """
     return """
     Countdown clock for a duration or to a date/time.\n
-    Interval Type\tDuration or Time
+    Clock Type\tCount from now (Duration) or to target (Time)
+    Format\tOutput time format
+    Show Units\tShow time units in output
     Duration\tInteger (sec) or HH:MM:SS
     Date\t\tMM/DD/YYYY or TODAY
     Time\t\tHH:MM:SS [am/pm] for 12-hour
-    Start\End Text\tShown during/after countdown
+    End Text\tShown after countdown
     Text Source\tSource for start / end text
     """
 
@@ -446,15 +506,15 @@ def script_defaults(settings):
 
     for _k, _v in script_state.properties.items():
 
-        if _v.type != script_state.OBS_BUTTON:
+        if _v.type not in [script_state.OBS_BUTTON, script_state.OBS_BOOLEAN]:
             obs.obs_data_set_default_string(settings, _k, _v.default)
 
     for _k, _v in script_state.properties.items():
 
-        if _v.type != script_state.OBS_BUTTON:
+        if _v.type not in [script_state.OBS_BUTTON, script_state.OBS_BOOLEAN]:
             _v.cur_value = obs.obs_data_get_string(settings, _k)
 
-    if script_state.properties['interval_type'] == 'Duration':
+    if script_state.properties['clock_type'] == 'Duration':
 
         script_state.clock.set_duration(
             script_state.properties['duration'].cur_value)
@@ -483,12 +543,18 @@ def script_properties():
             for _item in _v.items:
                 obs.obs_property_list_add_string(_p, _item, _item)
 
+        elif _v.type == script_state.OBS_BOOLEAN:
+
+                obs.obs_properties_add_bool(props, _k, _v.name)
+
         else:
 
             obs.obs_properties_add_text(props, _k, _v.name, _v.type)
 
     obs.obs_properties_add_button(
         props, 'reset', 'Reset', reset_button_clicked)
+
+    script_state.obs_properties = props
 
     return props
 
