@@ -35,13 +35,11 @@ If Python3.6 is not already installed, it can be installed form the Python3 Rele
 
 https://www.python.org/downloads/release/python-368/
 
-(Note that Python 3.6.8 is the last release of python that comes with pre-com0piled binaries)
+(Note that Python 3.6.8 is the last release of python that comes with pre-compiled binaries)
 
 After installing Python 3.6, click on the "Pytohn Settings" tab in the OBS Scripts dialog and browse to the location of the Python 3.6 install.  The location varies by platform.  Under Windows, it's often in the user's director under AppData\Local\Programs\Python36.
 
 Once the proper location is selected, you may need to restart OBS for the change to take effect.  The properties panel, however, should now populate for the script.
-
-### Configuration
 
 ![](images/obs_scripts_configure.png)
 
@@ -110,6 +108,8 @@ Once the proper location is selected, you may need to restart OBS for the change
 #### End Text
   The text which replaces the timer when the countdown terminates or invalid values are entered.
 
+#### Text Source
+  The text source which will be updated by the script.  If you named a text source "countdown" (as in the tutorial above), it will appear in the dropdown list.
 
 #### Reset Button
   Click to reset the timer (duration timer only).
