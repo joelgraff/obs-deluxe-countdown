@@ -19,8 +19,9 @@ script included with OBS.
 https://github.com/obsproject/obs-studio/blob/b2302902a3b3e1cce140a6417f4c5e490869a3f2/UI/frontend-plugins/frontend-tools/data/scripts/countdown.lua
 """
 
-import datetime
+from datetime import datetime, timedelta
 import time
+
 from types import SimpleNamespace
 from copy import deepcopy
 
@@ -46,90 +47,80 @@ class Clock():
         Reset the clock - only effective for
         """
 
-        self.reference_time = datetime.datetime.now()
+        self.reference_time = datetime.now()
 
-    def get_time(self, show_units):
+    def get_time(self, time_format, hide_zero_time):
         """
         Get the countdown time as a string
         """
 
-        _current_time = datetime.datetime.now()
-        _result = None
+        _current_time = datetime.now()
+        _delta = timedelta(days=0, seconds=0)
+        _duration = 0
 
-        #calculate string of the time remaining since the timer was reset
+        print (_current_time, self.target_time)
+        #get clock time by duration
         if self.mode == 'duration':
+
             _delta = _current_time - self.reference_time
-            _duration = datetime.timedelta(seconds=self.duration)
+            _duration = self.duration - _delta.total_seconds()
 
-            if _delta > _duration:
-                return None
+            if _duration < 0:
+                _duration = 0
 
-            #build a list of hours, minuts, seconds
-            _result = str(_duration - _delta).split(':')
+        #get clock time by target time
+        elif self.target_time and _current_time < self.target_time:
 
-        #calculate string of the time remaining until the target time is reached
-        elif self.target_time is None or self.target_time < _current_time:
-            _result = ['00', '00', '00']
+            _delta = self.target_time - _current_time
+            _duration = (self.target_time - _current_time).total_seconds()
 
-        else:
-            _result = str(self.target_time - _current_time).split(':')
+        _fmt = time_format.split('%')
+        _fmt_2 = []
+        _result = ''
 
-        #formatting to pad missing zeros
-        _days_hours = _result[0].split(',')
+        #prepare time formatting
+        for _i, _v in enumerate(_fmt):
 
-        #if days were present, strip from the result
-        if len(_days_hours) > 1:
-            _result = _days_hours[1:] + _result[1:]
+            if not _v:
+                continue
 
+            _x = _v[0].lower()
 
-        #round the seconds to the nearest integer
-        _result[-1] = str(int(round(float(_result[-1]), 0)))
+            #prepend the result with time formatting for days
+            if _x == 'd':
 
-        #format according to the format string
-        _format = script_state.properties['format'].cur_value.split(':')
+                print(_delta)
+                if not (hide_zero_time and _delta.days == 0):
+                    _result = str(_delta.days) + _v[1:]
 
-        _fill = []
+                continue
 
-        for _v in ['h', 'm', 's']:
+            #if hiding zero time units, test for hour and minute conditions
+            if hide_zero_time:
 
-            _truth = [_v in _w.lower() for _w in _format]
+                if _x == 'h' and _duration < 3600:
 
-            if not any(_truth):
-                _fill.append('')
-            else:
-                _fill.append(_format[_truth.index(True)])
+                    #do not skip if hours is last in the format string
+                    if _fmt[-1][0].lower() != 'h':
+                        continue
 
-        _fn = lambda p: '{:0' + str(p) + 'd}' if p < 3 else '{:02d}'
+                if _x == 'm' and _duration < 60:
 
-        _fill = [_fn(len(_v)) if _v else None for _v in _fill]
+                    #do not skip if hours are still visible
+                    if not _fmt or _fmt[-1][0].lower() != 'h':
 
-        _result = [_result[_i] if _v else None for _i, _v in enumerate(_fill)]
+                        #do not skip if minutes are last in the format string
+                        if _fmt[-1][0].lower() != 'm':
+                            continue
 
-        _result = [
-            _fill[_i].format(int(_v)) for _i, _v in enumerate(_result) if _v]
+            _fmt_2.append(_v)
 
-        _literal = ':'.join(_result)
+        time_format = '%'.join([''] + _fmt_2)
 
-        print('LITERAL = ', _literal, show_units, _result)
+        _string = _result + time.strftime(time_format, time.gmtime(_duration))
 
-        if show_units:
-
-            _units = [' hours', ' minutes', ' seconds']
-
-            for _i, _v in enumerate(_result):
-
-                if not _v:
-                    continue
-
-                _result[_i] += _units[_i]
-
-            _literal = ', '.join(_result)
-
-        if len(_days_hours) > 1:
-            if _days_hours[0][0:2] != '-1':
-                _literal = _days_hours[0] + ', ' + _literal
-
-        return _literal
+        return SimpleNamespace(
+            string = _string, seconds = _duration)
 
     def set_duration(self, interval):
         """
@@ -218,7 +209,7 @@ class Clock():
             target_time[0] = 0
 
         _target = None
-        _now = datetime.datetime.now()
+        _now = datetime.now()
 
         #calculate date
         if target_date == 'TODAY':
@@ -227,7 +218,7 @@ class Clock():
         else:
             target_date = [int(_v) for _v in target_date.split('/')]
 
-        self.target_time = datetime.datetime(
+        self.target_time = datetime(
                 target_date[2], target_date[0], target_date[1],
                 target_time[0], target_time[1], target_time[2]
         )
@@ -273,7 +264,7 @@ class State():
             ['Duration', 'Date/Time']
         )
         _p['format'] = _fn('Format', 'HH:MM:SS', self.OBS_TEXT)
-        _p['show_units'] = _fn('Show Units', False, self.OBS_BOOLEAN)
+        _p['hide_zero_units'] = _fn('Hide Zero Units', False, self.OBS_BOOLEAN)
         _p['duration'] = _fn('Duration', '0', self.OBS_TEXT)
         _p['date'] = _fn('Date', 'TODAY', self.OBS_TEXT)
         _p['time'] = _fn('Time', '12:00:00 pm', self.OBS_TEXT)
@@ -360,24 +351,27 @@ def update_text():
     Update the text with the passed time string
     """
 
-    _units = script_state.properties['show_units'].cur_value
-    _time = script_state.clock.get_time(_units)
+    _hide_zero_units = script_state.properties['hide_zero_units'].cur_value
+    _format = script_state.properties['format'].cur_value
 
-    if not _time:
-        obs.remove_current_callback()
+    _time = script_state.clock.get_time(_format, _hide_zero_units)
 
+    print(_time)
     _source = script_state.get_value('text_source')
 
     if not _source:
         return
 
-    if _time is None or _time == "00:00:00":
-        _time = script_state.get_value('end_text')
+    _text = _time.string
+
+    if _time.seconds == 0:
+        obs.remove_current_callback()
+        _text = script_state.get_value('end_text')
 
     _settings = obs.obs_data_create()
     _source = obs.obs_get_source_by_name(_source)
 
-    obs.obs_data_set_string(_settings, 'text', _time)
+    obs.obs_data_set_string(_settings, 'text', _text)
     obs.obs_source_update(_source, _settings)
     obs.obs_data_release(_settings)
     obs.obs_source_release(_source)
