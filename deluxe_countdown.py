@@ -49,7 +49,7 @@ class Clock():
 
         self.reference_time = datetime.now()
 
-    def get_time(self, time_format, hide_zero_time):
+    def get_time(self, time_format, hide_zero_time, round_up):
         """
         Get the countdown time as a string
         """
@@ -58,7 +58,6 @@ class Clock():
         _delta = timedelta(days=0, seconds=0)
         _duration = 0
 
-        print (_current_time, self.target_time)
         #get clock time by duration
         if self.mode == 'duration':
 
@@ -84,12 +83,12 @@ class Clock():
             if not _v:
                 continue
 
-            _x = _v[0].lower()
+            #get the first letter of the current unit
+            _x = _v[:2].lower()
 
             #prepend the result with time formatting for days
-            if _x == 'd':
+            if 'd' in _x:
 
-                print(_delta)
                 if not (hide_zero_time and _delta.days == 0):
                     _result = str(_delta.days) + _v[1:]
 
@@ -98,26 +97,48 @@ class Clock():
             #if hiding zero time units, test for hour and minute conditions
             if hide_zero_time:
 
-                if _x == 'h' and _duration < 3600:
+                if 'h' in _x and _duration < 3600:
 
-                    #do not skip if hours is last in the format string
-                    if _fmt[-1][0].lower() != 'h':
+                    #skip unless hours is last in the format string
+                    if 'h' not in _fmt[-1][:2].lower():
                         continue
 
-                if _x == 'm' and _duration < 60:
+                if 'm' in _x and _duration < 60:
 
                     #do not skip if hours are still visible
-                    if not _fmt or _fmt[-1][0].lower() != 'h':
+                    if not _fmt or 'h' not in _fmt[-1][:2].lower():
 
-                        #do not skip if minutes are last in the format string
+                        #skip unless minutes are last in the format string
                         if _fmt[-1][0].lower() != 'm':
                             continue
 
             _fmt_2.append(_v)
 
+        _duration_2 = _duration
+
+        #round up the last time unit if required
+        if round_up:
+
+            _c = 0
+            _u = _fmt_2[-1][:2].lower()
+
+            if 'd' in _u:
+                _c = 86400
+
+            elif 'h' in _u:
+                _c = 3600
+
+            elif 'm' in _u:
+                _c = 60
+
+            elif 's' in _u:
+                _c = 1
+
+            _duration_2 += _c
+
         time_format = '%'.join([''] + _fmt_2)
 
-        _string = _result + time.strftime(time_format, time.gmtime(_duration))
+        _string = _result + time.strftime(time_format, time.gmtime(_duration_2))
 
         return SimpleNamespace(
             string = _string, seconds = _duration)
@@ -265,6 +286,7 @@ class State():
         )
         _p['format'] = _fn('Format', 'HH:MM:SS', self.OBS_TEXT)
         _p['hide_zero_units'] = _fn('Hide Zero Units', False, self.OBS_BOOLEAN)
+        _p['round_up'] = _fn('Round Up', False, self.OBS_BOOLEAN)
         _p['duration'] = _fn('Duration', '0', self.OBS_TEXT)
         _p['date'] = _fn('Date', 'TODAY', self.OBS_TEXT)
         _p['time'] = _fn('Time', '12:00:00 pm', self.OBS_TEXT)
@@ -353,10 +375,9 @@ def update_text():
 
     _hide_zero_units = script_state.properties['hide_zero_units'].cur_value
     _format = script_state.properties['format'].cur_value
+    _round_up = script_state.properties['round_up'].cur_value
+    _time = script_state.clock.get_time(_format, _hide_zero_units, _round_up)
 
-    _time = script_state.clock.get_time(_format, _hide_zero_units)
-
-    print(_time)
     _source = script_state.get_value('text_source')
 
     if not _source:
