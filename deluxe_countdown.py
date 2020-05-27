@@ -63,6 +63,7 @@ class Clock():
 
             _delta = _current_time - self.reference_time
             _duration = self.duration - _delta.total_seconds()
+            _delta = timedelta(seconds=_duration)
 
             if _duration < 0:
                 _duration = 0
@@ -71,7 +72,7 @@ class Clock():
         elif self.target_time and _current_time < self.target_time:
 
             _delta = self.target_time - _current_time
-            _duration = (self.target_time - _current_time).total_seconds()
+            _duration = _delta.total_seconds()
 
         _fmt = time_format.split('%')
         _fmt_2 = []
